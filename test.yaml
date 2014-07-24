@@ -1,0 +1,22 @@
+extends:
+- file: linux.yaml
+packages:
+  mpi:
+    use: host-mpi
+  boost:
+    toolset: gcc
+    address_model: 64
+    build_with: |
+      python
+  python:
+    host: false
+    link: shared
+  ipython:
+  blas:
+    use: host-blas
+  numpy:
+  scipy:
+  piranha:
+    debug: true
+    build_with: |
+      python
