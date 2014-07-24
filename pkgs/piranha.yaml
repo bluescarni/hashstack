@@ -1,17 +1,25 @@
 extends: [cmake_package]
 dependencies:
-  build: [boost, gmp, mpfr]
-  run: [boost, gmp, mpfr]
+  build: [boost, gmp, mpfr, {{build_with}}]
+  run: [boost, gmp, mpfr, {{build_with}}]
 
 sources:
 - url: https://github.com/bluescarni/piranha.git
-  key: git:a871a25e79516bf4ee32064ea25fabbc85f386e0
+  key: git:9876e43093d10e8cb6fea8b6b8075fe9214eb9a1
 
 build_stages:
-- name: configure
-  extra: ['-D BOOST_ROOT=$BOOST_DIR',
-          '-D GMP_INCLUDE_DIR=$GMP_DIR/include',
-          '-D GMP_LIBRARIES=$GMP_DIR/lib/libgmp.so',
-          '-D MPFR_INCLUDE_DIR=$MPFR_DIR/include',
-          '-D MPFR_LIBRARIES=$MPFR_DIR/lib/libmpfr.so',
-          ]
+  - when: python in build_with and platform != "Darwin"
+    name: configure
+    extra: ['-D BUILD_PYRANHA:BOOL=ON',
+            '-D BUILD_TESTS:BOOL=OFF',
+            '-D PYTHON_INCLUDE_PATH:PATH="${PYTHON_DIR}/include/python{{pyver}}"',
+            '-D PYTHON_LIBRARY:PATH="${PYTHON_DIR}/lib/libpython{{pyver}}.so"']
+  - when: python in build_with and platform == "Darwin"
+    name: configure
+    extra: ['-D BUILD_PYRANHA:BOOL=ON',
+            '-D BUILD_TESTS:BOOL=OFF',
+            '-D PYTHON_INCLUDE_PATH:PATH="${PYTHON_DIR}/include/python{{pyver}}"',
+            '-D PYTHON_LIBRARY:PATH="${PYTHON_DIR}/lib/libpython{{pyver}}.dylib"']
+  - when: not python in build_with
+    name: configure
+    extra: ['-D BUILD_TESTS:BOOL=OFF']
